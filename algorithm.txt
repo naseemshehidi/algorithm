@@ -1,0 +1,106 @@
+
+Program Plagiat;
+Uses Wincrt;
+Var
+  T1,T2: String;
+  nbc: Integer;
+Function Nbmots(ch:String): Integer;
+Var
+  nb,i: Integer;
+Begin
+  nb := 0;
+  For i:=1 To Length(ch)-2 Do
+    If ch[i]=' ' Then nb := nb+1;
+  nbmots := nb+1;
+End;
+Function Commun(ch1,ch2:String): Integer;
+Type
+  tab = Array[1..100] Of String;
+Var
+  t11,t22: tab;
+  n1,n2,nb,i,j,k: Integer;
+  trouve: Boolean;
+Procedure extraire_mots(ch:String;Var t:tab;Var n:Integer);
+Var
+  i: Integer;
+Begin
+{Ajout de n-1 mots au tableau }
+  i := 0;
+  While (Pos(' ',ch)<>0) Do
+    Begin
+      i := i+1;
+      t[i] := Copy(ch,1,Pos(' ',ch)-1);
+      Delete(ch,1,Pos(' ',ch));
+    End;
+{Ajout du dernier mot au tableau }
+  i := i+1;
+  t[i] := Copy(ch,1,Pos('.',ch)-1);
+{nombre de mots = taille n de tableau}
+  n := i;
+End;
+Begin
+{extraire les mots de T1 et T2 dans deux tableaux T11 et T22}
+  extraire_mots(ch1,T11,n1);
+  extraire_mots(ch2,T22,n2);
+  Writeln('Les mots communs:');
+  nb := 0;
+  For i:=1 To n1 Do
+    Begin
+      j := 0;
+      trouve := False;
+      Repeat
+        j := j+1;
+ {rechercher si un mot de T11 se trouve dans T22}
+        If t11[i]=t22[j] Then
+          Begin
+            trouve := True;
+            nb := nb+1;
+            Write(t11[i],' - ');
+ {effacer le mot trouvé dans T22 par décalage des éléments }
+            For k:=j To n2-1 Do
+              t22[k] := t22[k+1];
+ { Par conséquent la taille du tableau diminue}
+            n2 := n2-1;
+          End;
+      Until (Trouve) Or (j>n2);
+    End;
+  commun := nb;
+End;
+Function verif(ch:String): Boolean;
+Var
+  ok: Boolean;
+  i: Integer;
+Begin
+  ok := True;
+  i := 0;
+  Repeat
+    i := i+1;
+    If Not(ch[i] In ['A'..'Z',' ']) Then ok := False;
+  Until (i=Length(ch)-1) Or (ok=False);
+  Verif := ok;
+End;
+Procedure saisir(Var ch:String);
+Begin
+  Repeat
+    Write('Donner une chaine :');
+    Readln(ch);
+  Until (ch[1] In ['A'..'Z']) And (Length(ch)<=200) And (ch[Length(ch)]='.') And (verif(ch)=True);
+ {garder un seul espace entre deux mots consécutifs}
+  While Pos('  ',ch)<>0 Do
+    Delete(ch,Pos('  ',ch),1);
+ { ne garder aucun espace avant le point de fin de texte}
+  If ch[Length(ch)-1]=' ' Then Delete(ch,Length(ch)-1,1);
+End;
+Begin
+  Writeln('saisir deux textes T1 et T2 ayant un même nombre de mots:');
+  Repeat
+    Writeln('Donner T1:');
+    Saisir (T1);
+    Writeln('Donne T2:');
+    Saisir (T2);
+  Until (Nbmots (T1) = Nbmots (T2));
+  Nbc := Commun (T1,T2);
+  Writeln('Nombre de mots communs: ',nbc);
+  If nbc>Nbmots(T1) Div 2 Then Writeln('le texte T2 est plagiat de T1')
+  Else Writeln('le texte T2 n''est pas plagiat de T1')
+End.
